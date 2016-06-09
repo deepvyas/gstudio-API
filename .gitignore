@@ -1,0 +1,6 @@
+bin/
+django-json-rpc/
+include/
+lib/
+local/
+pip-selfcheck.json
