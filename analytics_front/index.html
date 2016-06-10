@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Document</title>
+<script src="./js/d3.v3.min.js" charset="utf-8"></script>
+<style>
+
+.graph_cont div {
+  font: 10px sans-serif;
+  background-color: steelblue;
+  text-align: right;
+  padding: 3px;
+  margin: 1px;
+  color: white;
+}
+
+/*for pie chart*/
+svg {
+	width: 100%;
+	height: 100%;
+}
+
+path.slice{
+	stroke-width:2px;
+}
+
+polyline{
+	opacity: .3;
+	stroke: black;
+	stroke-width: 2px;
+	fill: none;
+}
+
+</style>
+</head>
+<body>
+
+<div id="main_container">
+	<div class="select_wrapper">
+		<select id="object_type">
+			<option disabled selected value> -- select an option -- </option>
+			<optgroup class="opt_to_select"> </optgroup>
+		</select>
+		<select id="dataset">
+			<option disabled selected value> -- select an option -- </option>
+			<optgroup class="opt_to_select"> </optgroup>
+		</select>
+		<select id="graph_type">
+			<option disabled selected value> -- select an option -- </option>
+			<optgroup class="opt_to_select"> </optgroup>
+		</select>
+	</div>
+	<div class="graph_cont">
+		
+	</div>
+</div>
+
+</body>
+<script>
+window.onload = function(){
+	load_obj();
+}
+
+var color = d3.scale.ordinal()
+	.domain(["Lorem ipsum", "dolor sit", "amet", "consectetur", "adipisicing", "elit", "sed", "do", "eiusmod", "tempor", "incididunt"])
+	.range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+
+d3.select('#object_type').on('change', function(){
+	var val = mapping[this.value];
+
+	d3.select('#dataset').select('.opt_to_select')
+		.html('');
+	var ele = d3.select('#dataset').select('.opt_to_select');
+	for(i=0 ; i< dataset[val.dataset].length; i++){
+		ele.append('option')
+			.attr('value',i)
+			.html('Dataset '+ i);
+	}
+
+	d3.select('#graph_type').select('.opt_to_select')
+		.html('');
+	var ele = d3.select('#graph_type').select('.opt_to_select');
+	for(i=0; i<val.graph_type.length; i++){
+		ele.append('option')
+			.attr('value', i)
+			.html(graphs[i].name);
+	}
+});
+
+d3.selectAll('#dataset, #graph_type').on('change', function(){
+	refresh_graphs();
+});
+
+var objects = [
+	{"name": "Object1", "value": 0},
+	{"name": "Object2", "value": 1},
+	{"name": "Object3", "value": 2},
+]
+var dataset = [
+	[
+		[{"label":"Lorem ipsum","value":83},{"label":"dolor sit","value":16},{"label":"amet","value":54},{"label":"consectetur","value":60},{"label":"adipisicing","value":68},{"label":"elit","value":46},{"label":"sed","value":35},{"label":"do","value":89},{"label":"eiusmod","value":32},{"label":"tempor","value":30},{"label":"incididunt","value":20}],
+		[{"label":"Lorem ipsum","value":93},{"label":"dolor sit","value":18},{"label":"amet","value":42},{"label":"consectetur","value":28},{"label":"adipisicing","value":70},{"label":"elit","value":72},{"label":"sed","value":3},{"label":"do","value":88},{"label":"eiusmod","value":24},{"label":"tempor","value":87},{"label":"incididunt","value":32}],
+	],
+	[
+		[{"label":"Lorem ipsum","value":20},{"label":"dolor sit","value":26},{"label":"amet","value":62},{"label":"consectetur","value":31},{"label":"adipisicing","value":7},{"label":"elit","value":32},{"label":"sed","value":88},{"label":"do","value":81},{"label":"eiusmod","value":72},{"label":"tempor","value":52},{"label":"incididunt","value":99}],
+		[{"label":"Lorem ipsum","value":44},{"label":"dolor sit","value":10},{"label":"amet","value":13},{"label":"consectetur","value":60},{"label":"adipisicing","value":44},{"label":"elit","value":56},{"label":"sed","value":67},{"label":"do","value":46},{"label":"eiusmod","value":92},{"label":"tempor","value":49},{"label":"incididunt","value":16}],
+	],
+	[
+		[{"label":"Lorem ipsum","value":8},{"label":"dolor sit","value":90},{"label":"amet","value":29},{"label":"consectetur","value":58},{"label":"adipisicing","value":82},{"label":"elit","value":34},{"label":"sed","value":21},{"label":"do","value":85},{"label":"eiusmod","value":37},{"label":"tempor","value":51},{"label":"incididunt","value":27}],
+	]
+];
+
+var mapping =[
+	{
+		"dataset": 0,
+		"graph_type": [0]
+	},
+	{
+		"dataset": 1,
+		"graph_type": [0, 1]
+	},
+	{
+		"dataset": 2,
+		"graph_type": [1]
+	},
+];
+var graphs ={
+	"0": {
+			"name": 'Bar Graph',
+			"func": function(data){
+				d3.select(".graph_cont").html('');
+				var x = d3.scale.linear()
+				    .domain([0, d3.max(data, function(d) { return d.value; })])
+				    .range([0, 420]);
+
+				items =  d3.select(".graph_cont").selectAll("div").data(data);
+				items.enter().append("div");
+				items.exit().remove();
+				items.style("width", function(d) { return x(d.value) + "px"; })
+					.text(function(d) { return d.label + ' : ' + d.value; });
+			}
+		 },
+	"1": {
+			"name": 'Pie Graph', 
+			"func": function(data){
+				d3.select(".graph_cont").html('');
+				var key = function(d){ return d.data.label; };
+				var svg = d3.select(".graph_cont")
+				.append("svg")
+				.append("g")
+
+				svg.append("g")
+					.attr("class", "slices");
+				svg.append("g")
+					.attr("class", "labels");
+				svg.append("g")
+					.attr("class", "lines");
+
+				var width = 960,
+				    height = 450,
+					radius = Math.min(width, height) / 2;
+
+				var pie = d3.layout.pie()
+					.sort(null)
+					.value(function(d) {
+						return d.value;
+					});
+
+				var arc = d3.svg.arc()
+					.outerRadius(radius * 0.8)
+					.innerRadius(radius * 0.6);
+
+				var outerArc = d3.svg.arc()
+					.innerRadius(radius * 0.7)
+					.outerRadius(radius * 0.9);
+
+				svg.attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+				d3.select('svg').style("width", width).style("height", height);
+
+				/* ------- PIE SLICES -------*/
+				var slice = svg.select(".slices").selectAll("path.slice")
+					.data(pie(data), key);
+
+				slice.enter()
+					.insert("path")
+					.style("fill", function(d) { return color(d.data.label); })
+					.attr("class", "slice");
+
+				slice		
+					.transition().duration(1000)
+					.attrTween("d", function(d) {
+						this._current = this._current || d;
+						var interpolate = d3.interpolate(this._current, d);
+						this._current = interpolate(0);
+						return function(t) {
+							return arc(interpolate(t));
+						};
+					})
+
+				slice.exit()
+					.remove();
+
+				/* ------- TEXT LABELS -------*/
+
+				var text = svg.select(".labels").selectAll("text")
+					.data(pie(data), key);
+
+				text.enter()
+					.append("text")
+					.attr("dy", ".35em")
+					.text(function(d) {
+						return d.data.label;
+					});
+				
+				function midAngle(d){
+					return d.startAngle + (d.endAngle - d.startAngle)/2;
+				}
+
+				text.transition().duration(1000)
+					.attrTween("transform", function(d) {
+						this._current = this._current || d;
+						var interpolate = d3.interpolate(this._current, d);
+						this._current = interpolate(0);
+						return function(t) {
+							var d2 = interpolate(t);
+							var pos = outerArc.centroid(d2);
+							pos[0] = radius * (midAngle(d2) < Math.PI ? 1 : -1);
+							return "translate("+ pos +")";
+						};
+					})
+					.styleTween("text-anchor", function(d){
+						this._current = this._current || d;
+						var interpolate = d3.interpolate(this._current, d);
+						this._current = interpolate(0);
+						return function(t) {
+							var d2 = interpolate(t);
+							return midAngle(d2) < Math.PI ? "start":"end";
+						};
+					});
+
+				text.exit()
+					.remove();
+
+				/* ------- SLICE TO TEXT POLYLINES -------*/
+
+				var polyline = svg.select(".lines").selectAll("polyline")
+					.data(pie(data), key);
+				
+				polyline.enter()
+					.append("polyline");
+
+				polyline.transition().duration(1000)
+					.attrTween("points", function(d){
+						this._current = this._current || d;
+						var interpolate = d3.interpolate(this._current, d);
+						this._current = interpolate(0);
+						return function(t) {
+							var d2 = interpolate(t);
+							var pos = outerArc.centroid(d2);
+							pos[0] = radius * 0.95 * (midAngle(d2) < Math.PI ? 1 : -1);
+							return [arc.centroid(d2), outerArc.centroid(d2), pos];
+						};			
+					});
+				
+				polyline.exit()
+					.remove();
+			}
+		 },
+}
+
+
+function load_obj(){
+	d3.select('#object_type').select('.opt_to_select')
+		.html('');
+	var ele = d3.select('#object_type').select('.opt_to_select');
+	for(i=0 ;i<objects.length; i++){
+		ele.append('option')
+			.attr('value',objects[i].value)
+			.html(objects[i].name);
+	}
+}
+
+function refresh_graphs(){
+	var object_type, ds, graph_type;
+	object_type = d3.select('#object_type').node().value;
+	ds = d3.select('#dataset').node().value;
+	graph_type = d3.select('#graph_type').node().value;
+	if(ds != '' && graph_type != '')
+		graphs[graph_type].func(dataset[mapping[object_type].dataset][ds]);
+
+}
+</script>
+</html>
