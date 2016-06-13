@@ -1,8 +1,82 @@
 var graphs ={
+	"paint_graph": function(x, data){
+		d3.select(".graph_cont").html('');
+		this[x].func(data);
+	},
+	"test": {
+		"name": "test",
+		"func": function(data){
+			var margin = {top: 20, right: 20, bottom: 70, left: 50},
+			    width = 600 - margin.left - margin.right,
+			    height = 300 - margin.top - margin.bottom;
+
+			var x = d3.scale.ordinal().rangeRoundBands([0, width], .05);
+
+			var y = d3.scale.linear().range([height, 0]);
+
+			var xAxis = d3.svg.axis()
+			    .scale(x)
+			    .orient("bottom");
+
+			var yAxis = d3.svg.axis()
+			    .scale(y)
+			    .orient("left")
+			    .ticks(10)
+			    .tickFormat(function (d) {
+			        var prefix = d3.formatPrefix(d);
+			        return prefix.scale(d) + prefix.symbol;
+			    });
+
+			var svg = d3.select(".graph_cont").append("svg")
+			    .attr("width", width + margin.left + margin.right)
+			    .attr("height", height + margin.top + margin.bottom)
+			    .append("g")
+			    .attr("transform", 
+			          "translate(" + (margin.left+50) + "," + (margin.top+50) + ")");
+
+
+			x.domain(data.map(function(d) { return d.label; }));
+			y.domain([Math.min(0,d3.min(data, function(d) { return d.value; })) ,Math.max(0, d3.max(data, function(d) { return d.value; }))]).nice();
+
+			svg.append("g")
+				.attr("class", "x axis")
+				.attr("transform", "translate(0," + (height ) + ")")
+				.call(xAxis)
+				.selectAll("text")
+				.style("text-anchor", "end")
+				.attr("dx", "-.8em")
+				.attr("dy", "-.55em")
+				.attr("transform", "rotate(-90)" );
+
+			svg.append("g")
+				.attr("class", "y axis")
+				.call(yAxis)
+				.append("text")
+				.attr("transform", "rotate(-90)")
+				.attr("y", 0 - margin.left)
+        		.attr("x",0 - (height / 2))
+				.attr("dy", ".71em")
+				.style("text-anchor", "end")
+				.text("Value ($)");
+			
+			svg.append("g")
+				.attr("class","x_axis_zero axis")
+		        .attr("transform", "translate(0," + y(0) + ")")
+		        .call(xAxis.tickFormat("").tickSize(0));
+
+			svg.selectAll("rect")
+				.data(data)
+				.enter().append("rect")
+				.style("fill", "steelblue")
+				.attr("x", function(d) { return x(d.label); })
+				.attr("width", x.rangeBand())
+				.attr("y", function(d) { return d.value < 0 ? y(0) : y(d.value); })
+				.attr("height", function(d) { return Math.abs(y(d.value) - y(0)); });
+		}
+	},
 	"0": {
 			"name": 'Bar Graph',
 			"func": function(data){
-				d3.select(".graph_cont").html('');
 				var x = d3.scale.linear()
 				    .domain([0, d3.max(data, function(d) { return d.value; })])
 				    .range([0, 420]);
@@ -17,7 +91,6 @@ var graphs ={
 	"1": {
 			"name": 'Pie Graph', 
 			"func": function(data){
-				d3.select(".graph_cont").html('');
 				var key = function(d){ return d.data.label; };
 				var svg = d3.select(".graph_cont")
 				.append("svg")
