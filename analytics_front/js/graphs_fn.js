@@ -3,8 +3,8 @@ var graphs ={
 		d3.select(".graph_cont").html('');
 		this[x].func(data);
 	},
-	"test": {
-		"name": "test",
+	"0": {
+		"name": "Bar Graph",
 		"func": function(data){
 			var margin = {top: 20, right: 20, bottom: 70, left: 50},
 			    width = 600 - margin.left - margin.right,
@@ -28,11 +28,12 @@ var graphs ={
 			    });
 
 			var svg = d3.select(".graph_cont").append("svg")
-			    .attr("width", width + margin.left + margin.right)
-			    .attr("height", height + margin.top + margin.bottom)
+				.attr("id","main_svg")
+			    .attr("width", width + margin.left + margin.right + 20)
+			    .attr("height", height + margin.top + margin.bottom + 20)
 			    .append("g")
 			    .attr("transform", 
-			          "translate(" + (margin.left+50) + "," + (margin.top+50) + ")");
+			          "translate(" + (margin.left+20) + "," + (margin.top + 20) + ")");
 
 
 			x.domain(data.map(function(d) { return d.label; }));
@@ -74,7 +75,7 @@ var graphs ={
 				.attr("height", function(d) { return Math.abs(y(d.value) - y(0)); });
 		}
 	},
-	"0": {
+	"trash1": {
 			"name": 'Bar Graph',
 			"func": function(data){
 				var x = d3.scale.linear()

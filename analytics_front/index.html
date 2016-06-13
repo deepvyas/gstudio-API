@@ -168,7 +168,7 @@ function refresh_graphs(){
 	ds = d3.select('#dataset').node().value;
 	graph_type = d3.select('#graph_type').node().value;
 	if(ds != '' && graph_type != '')
-		graphs[graph_type].func(dataset[mapping[object_type].dataset][ds]);
+		graphs.paint_graph(graph_type, dataset[mapping[object_type].dataset][ds]);
 
 }
 </script>
