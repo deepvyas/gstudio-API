@@ -1,0 +1,14 @@
+{
+	"cities":[
+		{"properties":{"name":"qwe","state":"anp"},"coordinates":[674.74,253.32]},
+		{"properties":{"name":"asd","state":"arp"},"coordinates":[713.89,226.09]},
+		{"properties":{"name":"wqe","state":"ass"},"coordinates":[709.58,228.75]},
+		{"properties":{"name":"aas","state":"bih"},"coordinates":[692.86,229.89]},
+		{"properties":{"name":"fad","state":"chh"},"coordinates":[682.98,242.30]},
+		{"properties":{"name":"asf","state":"del"},"coordinates":[670.94,221.78]},
+		{"properties":{"name":"asd","state":"goa"},"coordinates":[662.83,259.02]},
+		{"properties":{"name":"sfd","state":"guj"},"coordinates":[659.03,237.11]},
+		{"properties":{"name":"cvf","state":"har"},"coordinates":[669.80,216.84]},
+		{"properties":{"name":"tyr","state":"hip"},"coordinates":[670.56,213.42]}
+	]
+}
